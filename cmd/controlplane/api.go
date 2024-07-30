@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"k8s.io/utils/ptr"
 	"net"
 
 	"github.com/spf13/cobra"
@@ -14,6 +15,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	ctrlcfg "sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	kargoapi "github.com/akuity/kargo/api/v1alpha1"
@@ -167,6 +169,9 @@ func (o *apiOptions) setupAPIClient(ctx context.Context) (*rest.Config, client.C
 					&corev1.Secret{},
 				},
 			},
+		},
+		Controller: ctrlcfg.Controller{
+			RecoverPanic: ptr.To(true),
 		},
 	})
 	if err != nil {

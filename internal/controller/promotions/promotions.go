@@ -337,35 +337,19 @@ func (r *reconciler) Reconcile(
 
 	newStatus := promo.Status.DeepCopy()
 
-	// Wrap the promoteFn() call in an anonymous function to recover() any panics, so
-	// we can update the promo's phase with Error if it does. This breaks an infinite
-	// cycle of a bad promo continuously failing to reconcile, and surfaces the error.
-	func() {
-		defer func() {
-			if err := recover(); err != nil {
-				if theErr, ok := err.(error); ok {
-					logger.Error(theErr, "Promotion panic")
-				} else {
-					logger.Error(nil, "Promotion panic")
-				}
-				newStatus.Phase = kargoapi.PromotionPhaseErrored
-				newStatus.Message = fmt.Sprintf("%v", err)
-			}
-		}()
-		otherStatus, promoteErr := r.promoteFn(
-			promoCtx,
-			*promo,
-			stage,
-			freight,
-		)
-		if promoteErr != nil {
-			newStatus.Phase = kargoapi.PromotionPhaseErrored
-			newStatus.Message = promoteErr.Error()
-			logger.Error(promoteErr, "error executing Promotion")
-		} else {
-			newStatus = otherStatus
-		}
-	}()
+	otherStatus, promoteErr := r.promoteFn(
+		promoCtx,
+		*promo,
+		stage,
+		freight,
+	)
+	if promoteErr != nil {
+		newStatus.Phase = kargoapi.PromotionPhaseErrored
+		newStatus.Message = promoteErr.Error()
+		logger.Error(promoteErr, "error executing Promotion")
+	} else {
+		newStatus = otherStatus
+	}
 
 	if newStatus.Phase.IsTerminal() {
 		newStatus.FinishedAt = &metav1.Time{Time: time.Now()}

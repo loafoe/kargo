@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"k8s.io/utils/ptr"
+	"sigs.k8s.io/controller-runtime/pkg/config"
 
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
@@ -104,6 +106,9 @@ func (o *garbageCollectorOptions) setupManager(ctx context.Context) (manager.Man
 			Scheme: scheme,
 			Metrics: server.Options{
 				BindAddress: "0",
+			},
+			Controller: config.Controller{
+				RecoverPanic: ptr.To(true),
 			},
 		},
 	)

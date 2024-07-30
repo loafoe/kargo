@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"k8s.io/utils/ptr"
+	"sigs.k8s.io/controller-runtime/pkg/config"
 	"sync"
 
 	"github.com/spf13/cobra"
@@ -194,6 +196,9 @@ func (o *controllerOptions) setupKargoManager(
 				BindAddress: "0",
 			},
 			Cache: cacheOpts,
+			Controller: config.Controller{
+				RecoverPanic: ptr.To(true),
+			},
 		},
 	)
 	return mgr, stagesReconcilerCfg, err
@@ -262,6 +267,9 @@ func (o *controllerOptions) setupArgoCDManager(ctx context.Context) (manager.Man
 				BindAddress: "0",
 			},
 			Cache: cacheOpts,
+			Controller: config.Controller{
+				RecoverPanic: ptr.To(true),
+			},
 		},
 	)
 }

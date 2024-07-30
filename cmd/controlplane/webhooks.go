@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"k8s.io/utils/ptr"
+	"sigs.k8s.io/controller-runtime/pkg/config"
 
 	"github.com/spf13/cobra"
 	authzv1 "k8s.io/api/authorization/v1"
@@ -99,6 +101,9 @@ func (o *webhooksServerOptions) run(ctx context.Context) error {
 			),
 			Metrics: server.Options{
 				BindAddress: "0",
+			},
+			Controller: config.Controller{
+				RecoverPanic: ptr.To(true),
 			},
 		},
 	)

@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"k8s.io/utils/ptr"
+	"sigs.k8s.io/controller-runtime/pkg/config"
 
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
@@ -117,6 +119,9 @@ func (o *managementControllerOptions) setupManager(ctx context.Context) (manager
 			Scheme: scheme,
 			Metrics: server.Options{
 				BindAddress: "0",
+			},
+			Controller: config.Controller{
+				RecoverPanic: ptr.To(true),
 			},
 		},
 	)
